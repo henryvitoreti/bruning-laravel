@@ -22,34 +22,33 @@ class DocumentRule implements ValidationRule
 
         // Check if the CPF has 11 digits
         if (strlen($document) != 11) {
-            $fail(__('The provided Document is invalid.'));
+            $fail('O CPF informado é inválido.');
             return;
         }
 
         // Check if all digits are the same (invalid CPF)
         if (preg_match('/(\d)\1{10}/', $document)) {
-            $fail(__('The provided Document is invalid.'));
+            $fail('O CPF informado é inválido.');
             return;
         }
 
         // Calculate the first verification digit
-        for ($i = 9, $j = 0, $sum = 0; $i > 0; $i--, $j++) {
-            $sum += $document[$j] * $i;
+        for ($i = 0, $j = 10, $sum = 0; $i < 9; $i++, $j--) {
+            $sum += $document[$i] * $j;
         }
         $remainder = $sum % 11;
         $firstDigit = ($remainder < 2) ? 0 : 11 - $remainder;
 
         // Calculate the second verification digit
-        for ($i = 10, $j = 0, $sum = 0; $i > 1; $i--, $j++) {
-            $sum += $document[$j] * $i;
+        for ($i = 0, $j = 11, $sum = 0; $i < 10; $i++, $j--) {
+            $sum += $document[$i] * $j;
         }
-        $sum += $firstDigit * 2;
         $remainder = $sum % 11;
         $secondDigit = ($remainder < 2) ? 0 : 11 - $remainder;
 
         // Check if the verification digits are correct
         if ($document[9] != $firstDigit || $document[10] != $secondDigit) {
-            $fail(__('The provided Document is invalid.'));
+            $fail('O CPF informado é inválido.');
         }
     }
 }

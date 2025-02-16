@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\StringHelper;
 use App\Rules\DocumentRule;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
@@ -50,13 +52,38 @@ class Employee extends Model
                 'unique:employees,document,'. $request->id ?? 'NULL' . ',id,deleted_at,NULL',
                 new DocumentRule
             ],
-            'birth_date' => 'required|date',
+            'birth_date' => 'required|date|date_format:Y-m-d|before_or_equal:'.Carbon::now()->subYears(18)->format('Y-m-d'),
             'role' => 'required|max:100',
         ];
     }
 
-    public function getBirthDateFormattedAttribute($value): string
+    /**
+     * @param Request $request
+     * @return string[]
+     */
+    public static function messages(Request $request): array
+    {
+        return [
+            'required' =>  'O campo é obrigatório.',
+            'max' => 'O campo não é uma data válida.',
+            'before_or_equal' => 'O campo deve ser uma data anterior ou igual a :date.',
+            'unique' => 'O campo já está sendo utilizado.',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getBirthDateFormattedAttribute(): string
     {
         return $this->birth_date->format('d/m/Y');
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocumentFormattedAttribute(): string
+    {
+        return StringHelper::formatDocument($this->document);
     }
 }

@@ -8,4 +8,6 @@ Route::group(['prefix' => 'employees/', 'name' => 'employees.'], function () {
     Route::post('', [EmployeeController::class, 'store'])->name('store');
     Route::get('{id}', [EmployeeController::class, 'show'])->name('show')->where('id', '[0-9]+');
     Route::patch('{id}', [EmployeeController::class, 'update'])->name('update')->where('id', '[0-9]+');
+    Route::delete('{id}', [EmployeeController::class, 'delete'])->name('delete')->where('id', '[0-9]+');
+    Route::patch('{id}/restore', [EmployeeController::class, 'restore'])->name('restore')->where('id', '[0-9]+');
 });

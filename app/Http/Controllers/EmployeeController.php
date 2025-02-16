@@ -7,6 +7,7 @@ use App\Http\Resources\EmployeeResource;
 use App\Repositories\EmployeeRepository;
 use App\Services\EmployeeService;
 use App\Traits\ResponseTrait;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends BaseController
@@ -31,7 +32,8 @@ class EmployeeController extends BaseController
      */
     public function index(): JsonResponse
     {
-        dd('index');
+        $employees = $this->repository->list();
+        return $this->response($this->resource::collection($employees)->resolve());
     }
 
     /**
@@ -40,7 +42,13 @@ class EmployeeController extends BaseController
      */
     public function store(EmployeeRequest $request): JsonResponse
     {
-        dd('store');
+        try {
+            $employee = $this->service->store($request);
+        } catch (Exception $exception) {
+            return $this->response(['message' => $exception->getMessage()], $exception->getCode());
+        }
+
+        return $this->response((new $this->resource($employee))->resolve());
     }
 
     /**
@@ -49,17 +57,67 @@ class EmployeeController extends BaseController
      */
     public function show($id): JsonResponse
     {
-        dd('show');
+        $employee = $this->repository->findWithoutFail($id);
+
+        if (!$employee) {
+            return $this->response(['message' => 'Funcionário não encontrado.'], 400);
+        }
+
+        return $this->response((new $this->resource($employee))->resolve());
+    }
+
+    /**
+     * @param int $id
+     * @param EmployeeRequest $request
+     * @return JsonResponse
+     */
+    public function update(int $id, EmployeeRequest $request): JsonResponse
+    {
+        $employee = $this->repository->findWithoutFail($id);
+
+        if (!$employee) {
+            return $this->response(['message' => 'Funcionário não encontrado.'], 400);
+        }
+
+        try {
+            $employee = $this->service->update($id, $request);
+        } catch (Exception $exception) {
+            return $this->response(['message' => $exception->getMessage()], $exception->getCode());
+        }
+
+        return $this->response((new $this->resource($employee))->resolve());
     }
 
     /**
      * @param $id
-     * @param EmployeeRequest $request
      * @return JsonResponse
      */
-    public function update($id, EmployeeRequest $request): JsonResponse
+    public function delete($id): JsonResponse
     {
-        dd('update');
+        $employee = $this->repository->findWithoutFail($id);
+
+        if (!$employee) {
+            return $this->response(['message' => 'Funcionário não encontrado.'], 400);
+        }
+
+        $employee->delete();
+        return $this->response([], 204);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function restore($id): JsonResponse
+    {
+        $employee = $this->repository->findWithTrash($id);
+
+        if (!$employee) {
+            return $this->response(['message' => 'Funcionário não encontrado.'], 400);
+        }
+
+        $employee->restore();
+        return $this->response((new $this->resource($employee))->resolve());
     }
 }
 
