@@ -22,10 +22,12 @@ class EmployeeRequest extends FormRequest
      */
     public function prepareForValidation(): void
     {
-        $this->merge([
-            'document' => StringHelper::onlyNumbers($this->get('document')),
-            'birth_date' => StringHelper::formatDate($this->get('birth_date')),
-        ]);
+        if ($this->get('document') && $this->get('birth_date')) {
+            $this->merge([
+                'document' => StringHelper::onlyNumbers($this->get('document')),
+                'birth_date' => StringHelper::formatDate($this->get('birth_date')),
+            ]);
+        }
     }
 
     /**
