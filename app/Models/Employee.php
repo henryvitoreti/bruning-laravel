@@ -41,7 +41,7 @@ class Employee extends Model
     public static function rules(Request $request): array
     {
         return [
-            'code' => 'required|max:4',
+            'code' => 'required|numeric|max_digits:4',
             'name' => 'required|max:150',
             'nickname' => 'required|max:100',
             'mother_name' => 'required|max:150',
@@ -66,6 +66,8 @@ class Employee extends Model
         return [
             'required' =>  'O campo é obrigatório.',
             'max' => 'O campo ultrapassou o limite de caracteres de :max.',
+            'max_digits' => 'O campo ultrapassou o limite de caracteres de :max_digits.',
+            'numeric' => 'O campo precisa ser constituído de números.',
             'before_or_equal' => 'O campo deve ser uma data anterior ou igual a :date.',
             'unique' => 'O campo já está sendo utilizado.',
         ];
