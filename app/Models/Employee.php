@@ -65,7 +65,7 @@ class Employee extends Model
     {
         return [
             'required' =>  'O campo é obrigatório.',
-            'max' => 'O campo não é uma data válida.',
+            'max' => 'O campo ultrapassou o limite de caracteres de :max.',
             'before_or_equal' => 'O campo deve ser uma data anterior ou igual a :date.',
             'unique' => 'O campo já está sendo utilizado.',
         ];
